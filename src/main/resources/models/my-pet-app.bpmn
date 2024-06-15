@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0bipw4k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.0.0">
+  <bpmn:process id="pet_viewer_workflow" name="My Pet Viewer" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_051n9uh</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_051n9uh" sourceRef="StartEvent_1" targetRef="capture_pet_type" />
+    <bpmn:userTask id="capture_pet_type" name="Pet Viewer">
+      <bpmn:documentation>Select Pet Type</bpmn:documentation>
+      <bpmn:incoming>Flow_051n9uh</bpmn:incoming>
+      <bpmn:outgoing>Flow_08wt5gb</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="inovke_fetch_image" name="Invoke Service">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="fetchpetimage" retries="1" />
+        <zeebe:ioMapping>
+          <zeebe:output source="=imageUrl" target="imageUrl" />
+          <zeebe:output source="=type" target="image_type" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_06r1m1f</bpmn:incoming>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0m7eygj">
+      <bpmn:incoming>Flow_08wt5gb</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:boundaryEvent id="image_fetch_exception" name="Fetch Exception" attachedToRef="inovke_fetch_image">
+      <bpmn:outgoing>Flow_1ixw100</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0co1afk" errorRef="Error_09z0zsk" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1ixw100" sourceRef="image_fetch_exception" targetRef="invoke_api_exception" />
+    <bpmn:userTask id="invoke_api_exception" name="Exception Fetch">
+      <bpmn:incoming>Flow_1ixw100</bpmn:incoming>
+      <bpmn:outgoing>Flow_09eozjs</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_090tlo8">
+      <bpmn:incoming>Flow_09eozjs</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_09eozjs" sourceRef="invoke_api_exception" targetRef="Event_090tlo8" />
+    <bpmn:boundaryEvent id="invoke_api_message" name="invoke api message" cancelActivity="false" attachedToRef="capture_pet_type">
+      <bpmn:outgoing>Flow_06r1m1f</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1lll8v5" messageRef="Message_168931j" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_06r1m1f" sourceRef="invoke_api_message" targetRef="inovke_fetch_image" />
+    <bpmn:sequenceFlow id="Flow_08wt5gb" sourceRef="capture_pet_type" targetRef="Event_0m7eygj" />
+  </bpmn:process>
+  <bpmn:message id="Message_168931j" name="petType">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=businessKey" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:error id="Error_09z0zsk" name="fetch_exception" errorCode="500" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="pet_viewer_workflow">
+      <bpmndi:BPMNEdge id="Flow_051n9uh_di" bpmnElement="Flow_051n9uh">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ixw100_di" bpmnElement="Flow_1ixw100">
+        <di:waypoint x="320" y="318" />
+        <di:waypoint x="320" y="338" />
+        <di:waypoint x="480" y="338" />
+        <di:waypoint x="480" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09eozjs_di" bpmnElement="Flow_09eozjs">
+        <di:waypoint x="530" y="260" />
+        <di:waypoint x="582" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06r1m1f_di" bpmnElement="Flow_06r1m1f">
+        <di:waypoint x="320" y="175" />
+        <di:waypoint x="320" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08wt5gb_di" bpmnElement="Flow_08wt5gb">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="452" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_19r1pqk_di" bpmnElement="capture_pet_type">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02kiltq_di" bpmnElement="inovke_fetch_image">
+        <dc:Bounds x="270" y="220" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ciuqme_di" bpmnElement="invoke_api_exception">
+        <dc:Bounds x="430" y="220" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_090tlo8_di" bpmnElement="Event_090tlo8">
+        <dc:Bounds x="582" y="242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0m7eygj_di" bpmnElement="Event_0m7eygj">
+        <dc:Bounds x="452" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0fmnvo9_di" bpmnElement="invoke_api_message">
+        <dc:Bounds x="302" y="139" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="296" y="182" width="50" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0q3tlqd_di" bpmnElement="image_fetch_exception">
+        <dc:Bounds x="302" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="281" y="325" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
